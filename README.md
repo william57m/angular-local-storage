@@ -23,6 +23,7 @@ An Angular module that gives you access to the browsers local storage, **v0.1.5*
 - [API Documentation](#api-documentation)
  - [isSupported](#issupported)
  - [getStorageType](#getstoragetype)
+ - [setStorageType](#setstoragetype)
  - [set](#set)
  - [get](#get)
  - [keys](#keys)
@@ -60,7 +61,7 @@ When you're done, your setup should look similar to the following:
 <!doctype html>
 <html ng-app="myApp">
 <head>
-   
+
 </head>
 <body>
     ...
@@ -158,6 +159,15 @@ myApp.controller('MainCtrl', function($scope, localStorageService) {
   //...
 });
 ```
+###setStorageType
+**storageType:** `sessionStorage or localStorage`
+```js
+myApp.controller('MainCtrl', function($scope, localStorageService) {
+  //...
+  localStorageService.setStorageType(storageType);
+  //...
+});
+```
 ###set
 Directly adds a value to local storage.<br/>
 If local storage is not supported, use cookies instead.<br/>
@@ -225,8 +235,8 @@ myApp.controller('MainCtrl', function($scope, localStorageService) {
 });
 ```
 ###bind
-Bind $scope key to localStorageService.  
-**Usage:** `localStorageService.bind(scope, property, value[optional], key[optional])`  
+Bind $scope key to localStorageService.
+**Usage:** `localStorageService.bind(scope, property, value[optional], key[optional])`
 ***key:*** The corresponding key used in local storage
 **Returns:** deregistration function for this listener.
 ```js
@@ -234,7 +244,7 @@ myApp.controller('MainCtrl', function($scope, localStorageService) {
   //...
   localStorageService.set('property', 'oldValue');
   $scope.unbind = localStorageService.bind($scope, 'property');
-  
+
   //Test Changes
   $scope.update = function(val) {
     $scope.property = val;
@@ -267,7 +277,7 @@ myApp.controller('MainCtrl', function($scope, localStorageService) {
 });
 ```
 ###length
-Return localStorageService.length, ignore keys that not owned.  
+Return localStorageService.length, ignore keys that not owned.
 **Returns** `Number`
 ```js
 myApp.controller('MainCtrl', function($scope, localStorageService) {
@@ -344,7 +354,7 @@ Check out the full demo at http://gregpike.net/demos/angular-local-storage/demo.
 * Don't forget about tests.
 * If you planning add some feature please create issue before.
 
-Clone the project: 
+Clone the project:
 ```sh
 $ git clone https://github.com/<your-repo>/angular-local-storage.git
 $ npm install

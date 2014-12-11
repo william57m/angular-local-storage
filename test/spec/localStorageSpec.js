@@ -163,6 +163,20 @@ describe('localStorageService', function() {
     });
   });
 
+  it('should be able to change storage to SessionStorage', function() {
+    inject(function(localStorageService) {
+      localStorageService.setStorageType('sessionStorage');
+      expect(localStorageService.getStorageType()).toEqual('sessionStorage');
+    });
+  });
+
+  it('should be able to change storage to LocalStorage', function() {
+    inject(function(localStorageService) {
+      localStorageService.setStorageType('localStorage');
+      expect(localStorageService.getStorageType()).toEqual('localStorage');
+    });
+  });
+
   it('should be able to return the derive key', function() {
     module(setPrefix('myApp'));
     inject(function(localStorageService) {
@@ -217,7 +231,7 @@ describe('localStorageService', function() {
       addItem('key', '777'),
       expectAdding('ls.key', angular.toJson('777')),
       expectMatching('key', '777')
-    )
+    );
   });
 
   it('should be able to get items', inject(
@@ -391,7 +405,7 @@ describe('localStorageService', function() {
 
     beforeEach(module('LocalStorageModule', function($provide) {
       $provide.value('$window', {
-        sessionStorage: localStorageMock()
+          sessionStorage: localStorageMock()
       });
     }));
 
