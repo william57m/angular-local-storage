@@ -58,7 +58,7 @@ describe('localStorageService', function() {
 
   function expectSupporting(expected) {
     return function(localStorageService) {
-      expect(localStorageService.isSupported).toEqual(expected);
+      expect(localStorageService.isSupported()).toEqual(expected);
     };
   }
 

@@ -407,6 +407,9 @@ angularLocalStorage.provider('localStorageService', function () {
       storageType = _storageType;
     };
 
+    // Execute once to init storageType (in the case were storage fallback)
+    browserSupportsLocalStorage()
+
     return {
       isSupported: browserSupportsLocalStorage,
       getStorageType: getStorageType,
