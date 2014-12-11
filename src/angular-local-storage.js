@@ -1,6 +1,6 @@
 var angularLocalStorage = angular.module('LocalStorageModule', []);
 
-angularLocalStorage.provider('localStorageService', function() {
+angularLocalStorage.provider('localStorageService', function () {
 
   // You should set a prefix to avoid overwriting any local storage variables from the rest of your app
   // e.g. localStorageServiceProvider.setPrefix('yourAppName');
@@ -87,7 +87,7 @@ angularLocalStorage.provider('localStorageService', function() {
       return prefix + key;
     };
     // Checks the browser to see if local storage is supported
-    var browserSupportsLocalStorage = (function () {
+    var browserSupportsLocalStorage = function() {
       try {
         var supported = (storageType in $window && $window[storageType] !== null);
 
@@ -109,7 +109,7 @@ angularLocalStorage.provider('localStorageService', function() {
         $rootScope.$broadcast('LocalStorageModule.notification.error', e.message);
         return false;
       }
-    }());
+    };
 
 
 
@@ -125,8 +125,8 @@ angularLocalStorage.provider('localStorageService', function() {
       }
 
       // If this browser does not support local storage use cookies
-      if (!browserSupportsLocalStorage || self.storageType === 'cookie') {
-        if (!browserSupportsLocalStorage) {
+      if (!browserSupportsLocalStorage() || self.storageType === 'cookie') {
+        if (!browserSupportsLocalStorage()) {
             $rootScope.$broadcast('LocalStorageModule.notification.warning', 'LOCAL_STORAGE_NOT_SUPPORTED');
         }
 
@@ -155,8 +155,8 @@ angularLocalStorage.provider('localStorageService', function() {
     // Example use: localStorageService.get('library'); // returns 'angular'
     var getFromLocalStorage = function (key) {
 
-      if (!browserSupportsLocalStorage || self.storageType === 'cookie') {
-        if (!browserSupportsLocalStorage) {
+      if (!browserSupportsLocalStorage() || self.storageType === 'cookie') {
+        if (!browserSupportsLocalStorage()) {
           $rootScope.$broadcast('LocalStorageModule.notification.warning','LOCAL_STORAGE_NOT_SUPPORTED');
         }
 
@@ -180,8 +180,8 @@ angularLocalStorage.provider('localStorageService', function() {
     // Remove an item from local storage
     // Example use: localStorageService.remove('library'); // removes the key/value pair of library='angular'
     var removeFromLocalStorage = function (key) {
-      if (!browserSupportsLocalStorage || self.storageType === 'cookie') {
-        if (!browserSupportsLocalStorage) {
+      if (!browserSupportsLocalStorage() || self.storageType === 'cookie') {
+        if (!browserSupportsLocalStorage()) {
           $rootScope.$broadcast('LocalStorageModule.notification.warning', 'LOCAL_STORAGE_NOT_SUPPORTED');
         }
 
@@ -207,7 +207,7 @@ angularLocalStorage.provider('localStorageService', function() {
     // Example use: var keys = localStorageService.keys()
     var getKeysForLocalStorage = function () {
 
-      if (!browserSupportsLocalStorage) {
+      if (!browserSupportsLocalStorage()) {
         $rootScope.$broadcast('LocalStorageModule.notification.warning', 'LOCAL_STORAGE_NOT_SUPPORTED');
         return false;
       }
@@ -239,8 +239,8 @@ angularLocalStorage.provider('localStorageService', function() {
       var tempPrefix = prefix.slice(0, -1);
       var testRegex = new RegExp(tempPrefix + '.' + regularExpression);
 
-      if (!browserSupportsLocalStorage || self.storageType === 'cookie') {
-        if (!browserSupportsLocalStorage) {
+      if (!browserSupportsLocalStorage() || self.storageType === 'cookie') {
+        if (!browserSupportsLocalStorage()) {
           $rootScope.$broadcast('LocalStorageModule.notification.warning', 'LOCAL_STORAGE_NOT_SUPPORTED');
         }
 
@@ -402,9 +402,15 @@ angularLocalStorage.provider('localStorageService', function() {
       return count;
     };
 
+    var setStorageType = function(_storageType) {
+      self.storageType = _storageType;
+      storageType = _storageType;
+    };
+
     return {
       isSupported: browserSupportsLocalStorage,
       getStorageType: getStorageType,
+      setStorageType: setStorageType,
       set: addToLocalStorage,
       add: addToLocalStorage, //DEPRECATED
       get: getFromLocalStorage,
