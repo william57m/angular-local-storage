@@ -1,6 +1,6 @@
 'use strict';
 
-describe('localStorageService', function() {
+describe('localStorageService', function () {
   var elmSpy;
 
   //Actions
@@ -56,9 +56,9 @@ describe('localStorageService', function() {
     };
   }
 
-  function expectSupporting(expected) {
+  function expectSupporting(storageType, expected) {
     return function(localStorageService) {
-      expect(localStorageService.isSupported()).toEqual(expected);
+      expect(localStorageService.isSupported(storageType)).toEqual(expected);
     };
   }
 
@@ -125,7 +125,7 @@ describe('localStorageService', function() {
   }));
 
   it('isSupported should be true', inject(
-    expectSupporting(true)
+    expectSupporting('localStorage', true)
   ));
 
   it('typing should be "localStorage" by default, if supported', inject(
@@ -140,6 +140,11 @@ describe('localStorageService', function() {
   it('should add key to localeStorage null if value not provided', inject(
     addItem('foo'),
     expectAdding('ls.foo', null)
+  ));
+
+  it('should add key to localeStorage', inject(
+    addItem('foo', 'bar', 'localStorage'),
+    expectAdding('ls.foo', 'bar')
   ));
 
   it('should support to set custom prefix', function() {
@@ -265,7 +270,7 @@ describe('localStorageService', function() {
 
   it('should not broadcast event on removingItem', inject(function($rootScope, localStorageService) {
     var removeSpy = spyOn($rootScope, '$broadcast');
-    localStorageService.remove('Ariel', 'Mashraki');
+    localStorageService.remove('Ariel');
     expect(removeSpy).not.toHaveBeenCalled();
   }));
 
@@ -274,8 +279,7 @@ describe('localStorageService', function() {
     inject(function($rootScope, localStorageService) {
       var spy = spyOn($rootScope, '$broadcast');
       localStorageService.set('a8m', 'foobar');
-      localStorageService.remove('a8m', 'foobar');
-
+      localStorageService.remove('a8m');
       expect(spy).not.toHaveBeenCalled();
     });
   });
@@ -286,7 +290,7 @@ describe('localStorageService', function() {
       var spy = spyOn($rootScope, '$broadcast');
 
       localStorageService.set('a8m', 'foobar');
-      localStorageService.remove('a8m', 'foobar');
+      localStorageService.remove('a8m');
       expect(spy.callCount).toEqual(2);
     });
   });
@@ -414,8 +418,8 @@ describe('localStorageService', function() {
 
       inject(function($window, localStorageService) {
         var setSpy = spyOn($window.sessionStorage, 'setItem'),
-          getSpy = spyOn($window.sessionStorage, 'getItem'),
-          removeSpy = spyOn($window.sessionStorage, 'removeItem');
+            getSpy = spyOn($window.sessionStorage, 'getItem'),
+            removeSpy = spyOn($window.sessionStorage, 'removeItem');
 
         localStorageService.set('foo', 'bar');
         localStorageService.get('foo');
@@ -438,8 +442,63 @@ describe('localStorageService', function() {
     it('isSupported should be true on sessionStorage mode', function() {
       module(setStorage('sessionStorage'));
       inject(
-        expectSupporting(true)
+        expectSupporting('sessionStorage', true)
       );
+    });
+
+    it('should add key to sessionStorage', function() {
+      inject(function(localStorageService) {
+        localStorageService.set('foo', 'bar', 'sessionStorage');
+        expect(localStorageService.get('foo', 'sessionStorage')).toEqual('bar');
+        expect(localStorageService.get('foo', 'localStorage')).toEqual(false);
+      });
+    });
+
+    it('should get key from sessionStorage', function() {
+      inject(function(localStorageService) {
+        localStorageService.set('foo', 'bar', 'sessionStorage');
+        expect(localStorageService.get('foo', 'sessionStorage')).toEqual('bar');
+      });
+    });
+
+    it('should get keys from sessionStorage', function() {
+      inject(function(localStorageService) {
+        localStorageService.set('foo1', 'bar', 'sessionStorage');
+        localStorageService.set('foo2', 'bar', 'sessionStorage');
+        localStorageService.set('foo3', 'bar', 'localStorage');
+        expect(localStorageService.keys('sessionStorage')).toEqual(['foo1', 'foo2']);
+      });
+    });
+
+    it('should remove key from sessionStorage', function() {
+      inject(function(localStorageService) {
+        localStorageService.set('foo', 'bar', 'sessionStorage');
+        expect(localStorageService.get('foo', 'sessionStorage')).toEqual('bar');
+
+        localStorageService.remove('foo', 'sessionStorage');
+        expect(localStorageService.get('foo', 'sessionStorage')).toEqual(null);
+      });
+    });
+
+    it('should clear all from sessionStorage', function() {
+      inject(function(localStorageService) {
+        localStorageService.set('foo1', 'bar', 'sessionStorage');
+        localStorageService.set('foo2', 'bar', 'sessionStorage');
+        localStorageService.set('foo3', 'bar', 'localStorage');
+
+        localStorageService.clearAll('', 'sessionStorage');
+        expect(localStorageService.length('sessionStorage')).toEqual(0);
+      });
+    });
+
+    it('should get length from sessionStorage', function() {
+      inject(function(localStorageService) {
+        localStorageService.set('foo1', 'bar', 'sessionStorage');
+        localStorageService.set('foo2', 'bar', 'sessionStorage');
+        localStorageService.set('foo3', 'bar', 'localStorage');
+
+        expect(localStorageService.length('sessionStorage')).toEqual(2);
+      });
     });
 
   });
@@ -461,7 +520,7 @@ describe('localStorageService', function() {
     }));
 
     it('isSupported should be false on fallback mode', inject(
-      expectSupporting(false)
+      expectSupporting('localStorage', false)
     ));
 
     it('cookie.isSupported should be true if cookies are enabled', inject(

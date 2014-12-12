@@ -1,6 +1,6 @@
 /**
  * An Angular module that gives you access to the browsers local storage
- * @version v0.1.5 - 2014-12-10
+ * @version v0.1.5 - 2014-12-11
  * @link https://github.com/grevory/angular-local-storage
  * @author grevory <greg@gregpike.ca>
  * @license MIT License, http://www.opensource.org/licenses/MIT
@@ -433,6 +433,9 @@ angularLocalStorage.provider('localStorageService', function () {
       self.storageType = _storageType;
       storageType = _storageType;
     };
+
+    // Execute once to init storageType (in the case were storage fallback)
+    browserSupportsLocalStorage()
 
     return {
       isSupported: browserSupportsLocalStorage,

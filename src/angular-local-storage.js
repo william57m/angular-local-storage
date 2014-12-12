@@ -87,9 +87,9 @@ angularLocalStorage.provider('localStorageService', function () {
       return prefix + key;
     };
     // Checks the browser to see if local storage is supported
-    var browserSupportsLocalStorage = function() {
+    var browserSupportsLocalStorage = function(_storageType) {
       try {
-        var supported = (storageType in $window && $window[storageType] !== null);
+        var supported = (_storageType in $window && $window[_storageType] !== null);
 
         // When Safari (OS X or iOS) is in private browsing mode, it appears as though localStorage
         // is available, but trying to call .setItem throws an exception.
@@ -98,7 +98,7 @@ angularLocalStorage.provider('localStorageService', function () {
         // that exceeded the quota."
         var key = deriveQualifiedKey('__' + Math.round(Math.random() * 1e7));
         if (supported) {
-          webStorage = $window[storageType];
+          webStorage = $window[_storageType];
           webStorage.setItem(key, '');
           webStorage.removeItem(key);
         }
@@ -116,7 +116,9 @@ angularLocalStorage.provider('localStorageService', function () {
     // Directly adds a value to local storage
     // If local storage is not available in the browser use cookies
     // Example use: localStorageService.add('library','angular');
-    var addToLocalStorage = function (key, value) {
+    var addToLocalStorage = function (key, value, _storageType) {
+       _storageType = typeof _storageType === 'undefined' ? storageType : _storageType;
+
       // Let's convert undefined values to null to get the value consistent
       if (isUndefined(value)) {
         value = null;
@@ -125,8 +127,8 @@ angularLocalStorage.provider('localStorageService', function () {
       }
 
       // If this browser does not support local storage use cookies
-      if (!browserSupportsLocalStorage() || self.storageType === 'cookie') {
-        if (!browserSupportsLocalStorage()) {
+      if (!browserSupportsLocalStorage(_storageType) || storageType === 'cookie') {
+        if (!browserSupportsLocalStorage(_storageType)) {
             $rootScope.$broadcast('LocalStorageModule.notification.warning', 'LOCAL_STORAGE_NOT_SUPPORTED');
         }
 
@@ -142,7 +144,7 @@ angularLocalStorage.provider('localStorageService', function () {
         }
         if (webStorage) {webStorage.setItem(deriveQualifiedKey(key), value)};
         if (notify.setItem) {
-          $rootScope.$broadcast('LocalStorageModule.notification.setitem', {key: key, newvalue: value, storageType: self.storageType});
+          $rootScope.$broadcast('LocalStorageModule.notification.setitem', {key: key, newvalue: value, storageType: _storageType});
         }
       } catch (e) {
         $rootScope.$broadcast('LocalStorageModule.notification.error', e.message);
@@ -153,10 +155,11 @@ angularLocalStorage.provider('localStorageService', function () {
 
     // Directly get a value from local storage
     // Example use: localStorageService.get('library'); // returns 'angular'
-    var getFromLocalStorage = function (key) {
+    var getFromLocalStorage = function (key, _storageType) {
+      _storageType = typeof _storageType === 'undefined' ? storageType : _storageType;
 
-      if (!browserSupportsLocalStorage() || self.storageType === 'cookie') {
-        if (!browserSupportsLocalStorage()) {
+      if (!browserSupportsLocalStorage(_storageType) || storageType === 'cookie') {
+        if (!browserSupportsLocalStorage(_storageType)) {
           $rootScope.$broadcast('LocalStorageModule.notification.warning','LOCAL_STORAGE_NOT_SUPPORTED');
         }
 
@@ -179,9 +182,11 @@ angularLocalStorage.provider('localStorageService', function () {
 
     // Remove an item from local storage
     // Example use: localStorageService.remove('library'); // removes the key/value pair of library='angular'
-    var removeFromLocalStorage = function (key) {
-      if (!browserSupportsLocalStorage() || self.storageType === 'cookie') {
-        if (!browserSupportsLocalStorage()) {
+    var removeFromLocalStorage = function (key, _storageType) {
+      _storageType = typeof _storageType === 'undefined' ? storageType : _storageType;
+
+      if (!browserSupportsLocalStorage(_storageType) || storageType === 'cookie') {
+        if (!browserSupportsLocalStorage(_storageType)) {
           $rootScope.$broadcast('LocalStorageModule.notification.warning', 'LOCAL_STORAGE_NOT_SUPPORTED');
         }
 
@@ -194,7 +199,7 @@ angularLocalStorage.provider('localStorageService', function () {
       try {
         webStorage.removeItem(deriveQualifiedKey(key));
         if (notify.removeItem) {
-          $rootScope.$broadcast('LocalStorageModule.notification.removeitem', {key: key, storageType: self.storageType});
+          $rootScope.$broadcast('LocalStorageModule.notification.removeitem', {key: key, storageType: _storageType});
         }
       } catch (e) {
         $rootScope.$broadcast('LocalStorageModule.notification.error', e.message);
@@ -205,9 +210,10 @@ angularLocalStorage.provider('localStorageService', function () {
 
     // Return array of keys for local storage
     // Example use: var keys = localStorageService.keys()
-    var getKeysForLocalStorage = function () {
+    var getKeysForLocalStorage = function (_storageType) {
+      _storageType = typeof _storageType === 'undefined' ? storageType : _storageType;
 
-      if (!browserSupportsLocalStorage()) {
+      if (!browserSupportsLocalStorage(_storageType)) {
         $rootScope.$broadcast('LocalStorageModule.notification.warning', 'LOCAL_STORAGE_NOT_SUPPORTED');
         return false;
       }
@@ -232,15 +238,16 @@ angularLocalStorage.provider('localStorageService', function () {
     // Also optionally takes a regular expression string and removes the matching key-value pairs
     // Example use: localStorageService.clearAll();
     // Should be used mostly for development purposes
-    var clearAllFromLocalStorage = function (regularExpression) {
+    var clearAllFromLocalStorage = function (regularExpression, _storageType) {
+      _storageType = typeof _storageType === 'undefined' ? storageType : _storageType;
 
       regularExpression = regularExpression || "";
       //accounting for the '.' in the prefix when creating a regex
       var tempPrefix = prefix.slice(0, -1);
       var testRegex = new RegExp(tempPrefix + '.' + regularExpression);
 
-      if (!browserSupportsLocalStorage() || self.storageType === 'cookie') {
-        if (!browserSupportsLocalStorage()) {
+      if (!browserSupportsLocalStorage(_storageType) || storageType === 'cookie') {
+        if (!browserSupportsLocalStorage(_storageType)) {
           $rootScope.$broadcast('LocalStorageModule.notification.warning', 'LOCAL_STORAGE_NOT_SUPPORTED');
         }
 
@@ -253,7 +260,7 @@ angularLocalStorage.provider('localStorageService', function () {
         // Only remove items that are for this app and match the regular expression
         if (testRegex.test(key)) {
           try {
-            removeFromLocalStorage(key.substr(prefixLength));
+            removeFromLocalStorage(key.substr(prefixLength), _storageType);
           } catch (e) {
             $rootScope.$broadcast('LocalStorageModule.notification.error',e.message);
             return clearAllFromCookies();
@@ -391,9 +398,11 @@ angularLocalStorage.provider('localStorageService', function () {
 
     // Return localStorageService.length
     // ignore keys that not owned
-    var lengthOfLocalStorage = function() {
+    var lengthOfLocalStorage = function(_storageType) {
+      _storageType = typeof _storageType === 'undefined' ? storageType : _storageType;
+
       var count = 0;
-      var storage = $window[storageType];
+      var storage = $window[_storageType];
       for(var i = 0; i < storage.length; i++) {
         if(storage.key(i).indexOf(prefix) === 0 ) {
           count++;
@@ -408,7 +417,7 @@ angularLocalStorage.provider('localStorageService', function () {
     };
 
     // Execute once to init storageType (in the case were storage fallback)
-    browserSupportsLocalStorage()
+    browserSupportsLocalStorage(storageType)
 
     return {
       isSupported: browserSupportsLocalStorage,

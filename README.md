@@ -171,6 +171,8 @@ myApp.controller('MainCtrl', function($scope, localStorageService) {
 ###set
 Directly adds a value to local storage.<br/>
 If local storage is not supported, use cookies instead.<br/>
+**Parameters**
+- storageType: 'localStorage' or 'sessionStorage'
 **Returns:** `Boolean`
 ```js
 myApp.controller('MainCtrl', function($scope, localStorageService) {
@@ -184,6 +186,8 @@ myApp.controller('MainCtrl', function($scope, localStorageService) {
 ###get
 Directly get a value from local storage.<br/>
 If local storage is not supported, use cookies instead.<br/>
+**Parameters**
+- storageType: 'localStorage' or 'sessionStorage'
 **Returns:** `value from local storage`
 ```js
 myApp.controller('MainCtrl', function($scope, localStorageService) {
@@ -196,6 +200,8 @@ myApp.controller('MainCtrl', function($scope, localStorageService) {
 ```
 ###keys
 Return array of keys for local storage, ignore keys that not owned.<br/>
+**Parameters**
+- storageType: 'localStorage' or 'sessionStorage'
 **Returns:** `value from local storage`
 ```js
 myApp.controller('MainCtrl', function($scope, localStorageService) {
@@ -207,6 +213,8 @@ myApp.controller('MainCtrl', function($scope, localStorageService) {
 ###remove
 Remove an item from local storage by key.<br/>
 If local storage is not supported, use cookies instead.<br/>
+**Parameters**
+- storageType: 'localStorage' or 'sessionStorage'
 **Returns:** `Boolean`
 ```js
 myApp.controller('MainCtrl', function($scope, localStorageService) {
@@ -221,6 +229,8 @@ myApp.controller('MainCtrl', function($scope, localStorageService) {
 Remove all data for this app from local storage.<br/>
 If local storage is not supported, use cookies instead.<br/>
 **Note:** Optionally takes a regular expression string and removes matching.<br/>
+**Parameters**
+- storageType: 'localStorage' or 'sessionStorage'
 **Returns:** `Boolean`
 ```js
 myApp.controller('MainCtrl', function($scope, localStorageService) {
@@ -278,6 +288,8 @@ myApp.controller('MainCtrl', function($scope, localStorageService) {
 ```
 ###length
 Return localStorageService.length, ignore keys that not owned.
+**Parameters**
+- storageType: 'localStorage' or 'sessionStorage'
 **Returns** `Number`
 ```js
 myApp.controller('MainCtrl', function($scope, localStorageService) {
